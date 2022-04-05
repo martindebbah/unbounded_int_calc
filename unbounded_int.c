@@ -1,5 +1,6 @@
-#include "unbounded_int.h"
 #include <stdlib.h>
+#include <stddef.h>
+#include "unbounded_int.h"
 
 unbounded_int string2unbounded_int(const char *e) {
     unbounded_int *entier = malloc(sizeof(unbounded_int));
