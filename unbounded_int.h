@@ -30,13 +30,19 @@ char *unbounded_int2string(unbounded_int i); // fait
 int unbounded_int_cmp_unbounded_int(unbounded_int a, unbounded_int b); // fait
 
 // Renvoie -1 si a < b, 0 si a == b ou 1 si a > b (a et b respectivement l'unbounded_int et le long long passés en arguments)
-int unbounded_int_cmp_ll(unbounded_int a, long long b);
+int unbounded_int_cmp_ll(unbounded_int a, long long b); // fait en réutilisant les fonctions précédentes (peut-être à changer)
 
 // Renvoie un unbounded_int qui représente la somme des deux unbounded_int passés en arguments
 unbounded_int unbounded_int_somme(unbounded_int a, unbounded_int b);
 
+// Fonction auxiliaire pour additionner deux entiers positifs
+unbounded_int somme_pos(unbounded_int a, unbounded_int b); // fait
+
 // Renvoie un unbounded_int qui représente la différence des deux unbouded_int passés en arguments
 unbounded_int unbounded_int_difference( unbounded_int a, unbounded_int b);
+
+// Fonction auxiliaire pour soustraire b à a tels que a >= b >= 0
+unbounded_int diff_pos(unbounded_int a, unbounded_int b);
 
 // Renvoie un unbounded_int qui représente le produit des deux unbounded_int passés en arguments
 unbounded_int unbounded_int_produit( unbounded_int a, unbounded_int b);

@@ -123,3 +123,64 @@ int unbounded_int_cmp_unbounded_int(unbounded_int a, unbounded_int b) {
     }
     return 0; // a == b
 }
+
+int unbounded_int_cmp_ll(unbounded_int a, long long b) {
+    return unbounded_int_cmp_unbounded_int(a, ll2unbounded_int(b));
+}
+
+unbounded_int somme_pos(unbounded_int a, unbounded_int b) {
+    chiffre *pta = a.dernier;
+    chiffre *ptb = b.dernier;
+    unbounded_int *sum = malloc(sizeof(unbounded_int));
+    int len = 0;
+    int r = 0;
+    int n;
+    sum -> premier = malloc(sizeof(chiffre));
+    sum -> dernier = sum -> premier;
+    chiffre *current = sum -> dernier;
+    while (pta != NULL && ptb != NULL) {
+        n = (pta -> c - '0') + (ptb -> c - '0') + r;
+        current -> c = (char) ((n % 10) + '0');
+        r = n / 10;
+        pta = pta -> precedent;
+        ptb = ptb -> precedent;
+        len++;
+        current -> precedent = malloc(sizeof(chiffre));
+        current -> precedent -> suivant = current;
+        current = current -> precedent;
+        sum -> premier = current;
+    }
+    while (pta != NULL) {
+        n = pta -> c - '0' + r;
+        current -> c = (char) ((n % 10) + '0');
+        r = n / 10;
+        current -> precedent = malloc(sizeof(chiffre));
+        current -> precedent -> suivant = current;
+        current = current -> precedent;
+        sum -> premier = current;
+        pta = pta -> precedent;
+        len++;
+    }
+    while (ptb != NULL) {
+        n = ptb -> c - '0' + r;
+        current -> c = (char) ((n % 10) + '0');
+        r = n / 10;
+        current -> precedent = malloc(sizeof(chiffre));
+        current -> precedent -> suivant = current;
+        current = current -> precedent;
+        sum -> premier = current;
+        ptb = ptb -> precedent;
+        len++;
+    }
+    if (r == 0) {
+        sum -> premier = sum -> premier -> suivant;
+        sum -> premier -> precedent = NULL;
+        free(current);
+    }else {
+        current -> c = (char) (r + '0');
+        len++;
+    }
+    sum -> len = len;
+    sum -> signe = '+';
+    return *sum;
+}
