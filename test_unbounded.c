@@ -2,10 +2,8 @@
 #include "unbounded_int.h"
 
 int main(void) {
-    char *c = unbounded_int2string(string2unbounded_int("12345"));
-    //printf("%s", c);
-    int x = 52;
-    x /= 10;
-    printf("%d\n", x);
+    unbounded_int a = string2unbounded_int("3");
+    unbounded_int b = string2unbounded_int("-12");
+    printf("%d\n", unbounded_int_cmp_unbounded_int(a, b));
     return 0;
 }
