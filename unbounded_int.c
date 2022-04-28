@@ -187,69 +187,58 @@ unbounded_int somme_pos(unbounded_int a, unbounded_int b) {
 
 
 unbounded_int diff_pos(unbounded_int a, unbounded_int b) {
-    int cmp = unbounded_int_cmp_unbounded_int(a,b);
-    if(cmp == 0) return string2unbounded_int("0");
-    chiffre *pta;
-    chiffre *ptb;
-    if(cmp == 1){
-        pta = a.dernier;
-        ptb = b.dernier;
-    }
-    if(cmp == -1){
-        pta = b.dernier;
-        ptb = a.dernier;
-    }
-    unbounded_int *diff = malloc(sizeof(unbounded_int));
+    chiffre *pta = a.dernier;
+    chiffre *ptb = b.dernier;
+    unbounded_int diff;
+    chiffre *current = malloc(sizeof(chiffre));
+    current->suivant = NULL;
+    diff.dernier =current;
+    diff.premier = malloc(sizeof(chiffre));
     int len = 0;
     int r = 0;
     int n = 0;
-    diff -> premier = malloc(sizeof(chiffre));
-    diff ->dernier = diff->premier;
-    chiffre *current = diff->dernier;
-    while (pta != NULL) {
-        printf("%c   ",current -> c);
-        printf("%d   ",r);
-        printf("%d  \n",n);
-        if (ptb !=NULL){
+    int c;
+    while (ptb != NULL) {
             n = (pta -> c - '0') - (ptb -> c - '0') + r;
-           // printf("%d",n);
             if(n >= 0){
-                current -> c =(char)((n) +'0');
+                c = n;
                 r = 0;
                 }
             else{
-                current -> c =(char)((n+10) +'0');
+                c =n +10 ;
                 r = -1;  
                 }
-                //printf("%c",current ->c);
+            current -> c = (char) c +'0';
+            current -> precedent = malloc(sizeof(chiffre));
+            current -> precedent -> suivant = current;
+            current = current -> precedent;
+
             pta = pta -> precedent;
             ptb = ptb -> precedent;
             len++;
-            current -> precedent = malloc(sizeof(chiffre));
-            current -> precedent -> suivant = current;
-            current = current -> precedent;
-            diff -> premier = current;
-        }
-        else{
-            printf("aa");
-            n = (pta -> c - '0') - 0 + r;
+            }
+    while(pta !=NULL){
+            n = (pta -> c - '0' +r);
+    
             if(n >= 0){
-                current -> c =(char)((n) +'0');
+                c = n;
                 r = 0;
             }
             else{
-                current -> c =(char)((n+10) +'0');
+                c = n+ 10;
                 r = -1;  
                 }
             pta = pta -> precedent;
             len++;
+            current = (char) c +'0' ;
             current -> precedent = malloc(sizeof(chiffre));
             current -> precedent -> suivant = current;
             current = current -> precedent;
-            diff -> premier = current;  
             }
-    }
-    diff-> len = len;
-    diff -> signe = '+';
-    return *diff;
+
+    diff.premier = current -> suivant;
+    diff.premier -> precedent = NULL;
+    diff.len = len;
+    diff.signe = '+';
+    return diff;
 }
