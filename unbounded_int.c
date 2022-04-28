@@ -3,6 +3,12 @@
 #include <stdio.h>
 #include "unbounded_int.h"
 
+static unbounded_int diff_pos(unbounded_int a, unbounded_int b);
+
+static unbounded_int somme_pos(unbounded_int a, unbounded_int b);
+
+
+
 unbounded_int string2unbounded_int(const char *e) {
     unbounded_int *entier = malloc(sizeof(unbounded_int));
     int len = 0;
@@ -152,7 +158,7 @@ unbounded_int unbounded_int_difference( unbounded_int a, unbounded_int b){
     return diff;
 }
 
-unbounded_int somme_pos(unbounded_int a, unbounded_int b) {
+static unbounded_int somme_pos(unbounded_int a, unbounded_int b) {
     chiffre *pta = a.dernier;
     chiffre *ptb = b.dernier;
     unbounded_int *sum = malloc(sizeof(unbounded_int));
