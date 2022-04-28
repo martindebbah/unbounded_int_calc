@@ -42,7 +42,7 @@ unbounded_int somme_pos(unbounded_int a, unbounded_int b); // fait
 unbounded_int unbounded_int_difference( unbounded_int a, unbounded_int b);
 
 // Fonction auxiliaire pour soustraire b à a tels que a >= b >= 0
-unbounded_int diff_pos(unbounded_int a, unbounded_int b);
+static unbounded_int diff_pos(unbounded_int a, unbounded_int b);
 
 // Renvoie un unbounded_int qui représente le produit des deux unbounded_int passés en arguments
 unbounded_int unbounded_int_produit( unbounded_int a, unbounded_int b);

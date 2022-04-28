@@ -66,9 +66,18 @@ unbounded_int ll2unbounded_int(long long i) {
 char *unbounded_int2string(unbounded_int i) {
     char *str = malloc(sizeof(char) * i.len);
     chiffre *current = i.premier;
-    for (int j = 0; j < i.len; j++) {
-        str[j] = current -> c;
-        current = current -> suivant;
+    if(i.signe == '-'){
+        str[0] = i.signe;
+        for (int j = 1; j < i.len + 1; j++) {
+            str[j] = current -> c;
+            current = current -> suivant;
+        }
+    }
+    else{
+        for (int j = 0; j < i.len; j++) {
+            str[j] = current -> c;
+            current = current -> suivant;
+        }
     }
     return str;
 }
@@ -126,6 +135,21 @@ int unbounded_int_cmp_unbounded_int(unbounded_int a, unbounded_int b) {
 
 int unbounded_int_cmp_ll(unbounded_int a, long long b) {
     return unbounded_int_cmp_unbounded_int(a, ll2unbounded_int(b));
+}
+
+unbounded_int unbounded_int_difference( unbounded_int a, unbounded_int b){
+    int cmp = unbounded_int_cmp_unbounded_int(a,b);
+    unbounded_int diff;
+    if (cmp > 0){
+        diff = diff_pos(a,b);
+        diff.signe = '+';
+    }
+    else{
+        diff = diff_pos(b,a);
+        diff.signe = '-';
+    }
+
+    return diff;
 }
 
 unbounded_int somme_pos(unbounded_int a, unbounded_int b) {
@@ -186,7 +210,7 @@ unbounded_int somme_pos(unbounded_int a, unbounded_int b) {
 }
 
 
-unbounded_int diff_pos(unbounded_int a, unbounded_int b) {
+static unbounded_int diff_pos(unbounded_int a, unbounded_int b) {
     chiffre *pta = a.dernier;
     chiffre *ptb = b.dernier;
     unbounded_int diff;
