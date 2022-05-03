@@ -3,11 +3,11 @@
 #include <stdio.h>
 #include "unbounded_int.h"
 
-static unbounded_int diff_pos(unbounded_int a, unbounded_int b);
-
+// Fonction auxiliaire pour la somme (a >= 0 et b >= 0)
 static unbounded_int somme_pos(unbounded_int a, unbounded_int b);
 
-
+// Fonction auxiliaire pour la différence (0 < b < a)
+static unbounded_int diff_pos(unbounded_int a, unbounded_int b);
 
 unbounded_int string2unbounded_int(const char *e) {
     unbounded_int *entier = malloc(sizeof(unbounded_int));
@@ -70,20 +70,21 @@ unbounded_int ll2unbounded_int(long long i) {
 }
 
 char *unbounded_int2string(unbounded_int i) {
-    char *str = malloc(sizeof(char) * i.len);
-    chiffre *current = i.premier;
-    if(i.signe == '-'){
-        str[0] = i.signe;
-        for (int j = 1; j < i.len + 1; j++) {
-            str[j] = current -> c;
-            current = current -> suivant;
-        }
+    char *str;
+    int index = 0;
+    int len = i.len;
+    if (i.signe == '-') {
+        str = malloc(sizeof(char) * len + 1);
+        str[index] = '-';
+        index++;
+        len++;
+    }else {
+        str = malloc(sizeof(char) * len);
     }
-    else{
-        for (int j = 0; j < i.len; j++) {
-            str[j] = current -> c;
-            current = current -> suivant;
-        }
+    chiffre *current = i.premier;
+    for (; index < len; index++) {
+        str[index] = current -> c;
+        current = current -> suivant;
     }
     return str;
 }
@@ -143,19 +144,53 @@ int unbounded_int_cmp_ll(unbounded_int a, long long b) {
     return unbounded_int_cmp_unbounded_int(a, ll2unbounded_int(b));
 }
 
-unbounded_int unbounded_int_difference( unbounded_int a, unbounded_int b){
-    int cmp = unbounded_int_cmp_unbounded_int(a,b);
-    unbounded_int diff;
-    if (cmp > 0){
-        diff = diff_pos(a,b);
-        diff.signe = '+';
+unbounded_int unbounded_int_somme(unbounded_int a, unbounded_int b) {
+    int cmpa = unbounded_int_cmp_ll(a, 0);
+    int cmpb = unbounded_int_cmp_ll(b, 0);
+    if (cmpa >= 0 && cmpb >= 0) { // a, b >= 0 -> a + b
+        return somme_pos(a, b);
+    }else if (cmpa <= 0 && cmpb <= 0) { // a, b <= 0 -> -(|a| + |b|)
+        unbounded_int sum = somme_pos(a, b);
+        sum.signe = '-';
+        return sum;
+    }else if (cmpa >= 0 && cmpb < 0) { // a >= 0 et b < 0 -> a - |b|
+        b.signe = '+';
+        return unbounded_int_difference(a, b);
+    }else { // a < 0 et b >= 0 -> b - |a|
+        a.signe = '+';
+        return unbounded_int_difference(b, a);
     }
-    else{
-        diff = diff_pos(b,a);
-        diff.signe = '-';
-    }
+}
 
-    return diff;
+unbounded_int unbounded_int_difference(unbounded_int a, unbounded_int b) {
+    int cmpa = unbounded_int_cmp_ll(a, 0);
+    int cmpb = unbounded_int_cmp_ll(b, 0);
+    int cmp = unbounded_int_cmp_unbounded_int(a,b);
+    if (cmpa >= 0 && cmpb >= 0) { // a, b >= 0 -> a - b
+        if (cmp >= 0) {
+            return diff_pos(a, b);
+        }else {
+            unbounded_int diff = diff_pos(b, a);
+            diff.signe = '-';
+            return diff;
+        }
+    }else if (cmpa <= 0 && cmpb <= 0) { // a, b <= 0 -> |b| - |a|
+        if (cmp >= 0) {
+            return diff_pos(b, a);
+        }else {
+            unbounded_int diff = diff_pos(a, b);
+            diff.signe = '-';
+            return diff;
+        }
+    }else if (cmpa >= 0 && cmpb < 0) { // a >= 0 et b < 0 -> a + |b|
+        b.signe = '+';
+        return unbounded_int_somme(a, b);
+    }else { // a < 0 et b >= 0 -> -(b + |a|)
+        a.signe = '+';
+        unbounded_int diff = unbounded_int_somme(b, a);
+        diff.signe = '-';
+        return diff;
+    }
 }
 
 static unbounded_int somme_pos(unbounded_int a, unbounded_int b) {
@@ -221,50 +256,48 @@ static unbounded_int diff_pos(unbounded_int a, unbounded_int b) {
     chiffre *ptb = b.dernier;
     unbounded_int diff;
     chiffre *current = malloc(sizeof(chiffre));
-    current->suivant = NULL;
-    diff.dernier =current;
+    current -> suivant = NULL;
+    diff.dernier = current;
     diff.premier = malloc(sizeof(chiffre));
     int len = 0;
     int r = 0;
     int n = 0;
     int c;
     while (ptb != NULL) {
-            n = (pta -> c - '0') - (ptb -> c - '0') + r;
-            if(n >= 0){
-                c = n;
-                r = 0;
-                }
-            else{
-                c =n +10 ;
-                r = -1;  
-                }
-            current -> c = (char) c +'0';
-            current -> precedent = malloc(sizeof(chiffre));
-            current -> precedent -> suivant = current;
-            current = current -> precedent;
+        n = (pta -> c - '0') - (ptb -> c - '0') + r;
+        if (n >= 0) {
+            c = n;
+            r = 0;
+        }else {
+            c =n +10 ;
+            r = -1;  
+        }
+        current -> c = (char) c +'0';
+        current -> precedent = malloc(sizeof(chiffre));
+        current -> precedent -> suivant = current;
+        current = current -> precedent;
 
-            pta = pta -> precedent;
-            ptb = ptb -> precedent;
-            len++;
+        pta = pta -> precedent;
+        ptb = ptb -> precedent;
+        len++;
+    }
+    while(pta != NULL) {
+        n = (pta -> c - '0' +r);
+
+        if (n >= 0) {
+            c = n;
+            r = 0;
+        }else {
+            c = n+ 10;
+            r = -1;  
             }
-    while(pta !=NULL){
-            n = (pta -> c - '0' +r);
-    
-            if(n >= 0){
-                c = n;
-                r = 0;
-            }
-            else{
-                c = n+ 10;
-                r = -1;  
-                }
-            pta = pta -> precedent;
-            len++;
-            current = (char) c +'0' ;
-            current -> precedent = malloc(sizeof(chiffre));
-            current -> precedent -> suivant = current;
-            current = current -> precedent;
-            }
+        pta = pta -> precedent;
+        len++;
+        current -> c = (char) c +'0' ;
+        current -> precedent = malloc(sizeof(chiffre));
+        current -> precedent -> suivant = current;
+        current = current -> precedent;
+    }
 
     diff.premier = current -> suivant;
     diff.premier -> precedent = NULL;
