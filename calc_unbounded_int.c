@@ -1,5 +1,6 @@
 #include<stdio.h>
 #include<stdlib.h>
+#include<string.h>
 #include "unbounded_int.h"
 
 /*bon martin la c'est la merde;
@@ -11,7 +12,7 @@ putain j'ai fais aucun tp je sais pas ce qu'on peut ou pas faire sur un fichier 
 void setUp(){
    FILE *line = fopen("line.txt","w");
    int i =0;
-   while(i = fgetc(line) !=EOF){
+   while((i = fgetc(line)) !=EOF){
       printf("%c  \n",i);
    }
 }
@@ -19,15 +20,18 @@ void setUp(){
 
 int isaPrint(char* line){
    /*code*/
+   return 0;
 }
 
 int isAnAffectation(char* line){
    /*code*/
+   return 0;
 }
 
 
 int isAnOperation(char* line){
    /*code*/
+   return 0;
 }
 
 unbounded_int resultat(char* intA,char* intB,char op){
@@ -47,8 +51,39 @@ unbounded_int resultat(char* intA,char* intB,char op){
 
 
 
-int main(int argc, char const *argv[])
-{
-   setUp();
+int main(int argc, char **argv) {
+   int n = argc - 1;
+   FILE *in;
+   FILE *out;
+   if (n == 4) { // Ouverture des flots en fonction des arguments
+      if (strcmp(argv[1], "-i") == 0) {
+         in = fopen(argv[2], "r");
+      }else if (strcmp(argv[3], "-i") == 0) {
+         in = fopen(argv[4], "r");
+      }else {
+         in = stdin;
+      }
+      if (strcmp(argv[1], "-o") == 0) {
+         out = fopen(argv[2], "w");
+      }else if (strcmp(argv[3], "-o") == 0) {
+         out = fopen(argv[4], "w");
+      }else {
+         out = stdout;
+      }
+   }else if (n == 2) {
+      if (strcmp(argv[1], "-i") == 0) {
+         in = fopen(argv[2], "r");
+         out = stdout;
+      }
+      if (strcmp(argv[1], "-o") == 0) {
+         in = stdin;
+         out = fopen(argv[2], "w");
+      }
+   }else {
+      in = stdin;
+      out = stdout;
+   }
+
+   //setUp();
    return 0;
 }
