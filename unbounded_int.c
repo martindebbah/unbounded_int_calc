@@ -193,6 +193,66 @@ unbounded_int unbounded_int_difference(unbounded_int a, unbounded_int b) {
     }
 }
 
+unbounded_int unbounded_int_produit(unbounded_int a, unbounded_int b) {
+    chiffre *pta = a.dernier;
+    chiffre *ptb = b.dernier;
+    unbounded_int *produit = malloc(sizeof(unbounded_int));
+    produit -> premier = malloc(sizeof(chiffre));
+    produit -> dernier = produit -> premier;
+    int len = a.len + b.len;
+    int r;
+    int v;
+    chiffre *current = produit -> premier;
+    current -> precedent = NULL;
+    for (int i = 0; i < len; i++) { // Initialisation du unbounded_int
+        current -> c = '0';
+        current -> suivant = malloc(sizeof(chiffre));
+        current -> suivant -> precedent = current;
+        current = current -> suivant;
+    }
+    current = current -> precedent;
+    current -> suivant = NULL;
+    produit -> dernier = current;
+    chiffre *tmp = current;
+    while (ptb != NULL) {
+        r = 0;
+        if (ptb -> c == '0') {
+            ptb = ptb -> precedent;
+            tmp = tmp -> precedent;
+            current = tmp;
+            continue;
+        }
+        pta = a.dernier;
+        while (pta != NULL) {
+            v = (current -> c - '0') + (pta -> c - '0') * (ptb -> c - '0') + r;
+            current -> c = (char)((v % 10) + '0');
+            r = v / 10;
+            current = current -> precedent;
+            pta = pta -> precedent;
+        }
+        current -> c = (char)(r + '0');
+        ptb = ptb -> precedent;
+        tmp = tmp -> precedent;
+        current = tmp;
+    }
+    produit -> len = len;
+    if (a.signe == b.signe) {
+        produit -> signe = '+';
+    }else {
+        produit -> signe = '-';
+    }
+    // On enlève les 0 du début
+    while (produit -> premier -> c == '0') {
+        if (produit -> len == 1) {
+            break;
+        }
+        produit -> premier = produit -> premier -> suivant;
+        produit -> premier -> precedent = NULL;
+        produit -> len--;
+    }
+    return *produit;
+}
+
 static unbounded_int somme_pos(unbounded_int a, unbounded_int b) {
     chiffre *pta = a.dernier;
     chiffre *ptb = b.dernier;
