@@ -18,14 +18,7 @@ typedef struct variables {
 
 variable *getVar(char *s, variables *vars);
 unbounded_int resultat(unbounded_int a, unbounded_int b, char op);
-variables *add(variable *v, variables *vars);
-
-// J'ai pas mal avancé, le programme boucle sur tout le fichier et reconnaît les commandes.
-// On peut lire/écrire depuis/sur la sortie/entrée standard ou un fichier
-// Le seul problème que j'ai maintenant c'est que je n'arrive pas à faire fonctionner mon struct.
-// C'est à dire que les variables ne sont pas enregistrées.
-// J'ai l'impression que ça vient soit de la fonction add() soit de getVar().
-// Je push comme ça pour le moment désole c'est un peu de la merde mais je m'y remettrai demain.
+void add(variable *v, variables *vars);
 
 // PS: faudra pas qu'on oublie d'enlever ce setUp(), je l'ai laissé pour le moment si tu en as encore besoin.
 
@@ -48,9 +41,14 @@ int isAPrint(char* line) {
 }
 
 // Ecrit dans le flot out
-variables *print(char* lex, FILE *out, variables *vars) {
-   lex = strtok(NULL, " \n");
-   variable *v = getVar(lex, vars);
+void print(char* lex, FILE *out, variables *vars) {
+   lex = strtok(NULL, " \n"); // Le nom de la variable
+   char *var = malloc(strlen(lex) + 1);
+   strcpy(var, lex);
+   if (lex == NULL || lex[0] == '=' || strcmp(lex, "print") == 0) { // Pas de variable vide ou qui commence par '=' ou de nom print
+      return;
+   }
+   variable *v = getVar(var, vars);
    char *name = v -> s;
    char *value = unbounded_int2string(v -> n);
    char *str = malloc(strlen(name) + strlen(value) + 3 * sizeof(char) + 2);
@@ -59,17 +57,17 @@ variables *print(char* lex, FILE *out, variables *vars) {
    strcat(str, value);
    strcat(str, "\n");
    fputs(str, out);
-   vars = add(v, vars);
-   return vars;
 }
 
 // Affecte la valeur à la variable
-variables *affect(char *lex, variables *vars) {
-   char *var = lex; // Le nom de la variable (avant le '=')
+void affect(char *lex, variables *vars) {
+   char *var = malloc(strlen(lex) + 1); // Le nom de la variable (avant le '=')
+   strcpy(var, lex);
    lex = strtok(NULL, " =\n");
    if (lex == NULL) // Si la ligne est sans instruction
-      return vars;
-   char *val = lex; // La première valeur (après le '=')
+      return;
+   char *val = malloc(strlen(lex) + 1); // La première valeur (après le '=')
+   strcpy(val, lex);
    lex = strtok(NULL, " =");
    variable *v = malloc(sizeof(variable));
    v -> s = var;
@@ -84,7 +82,8 @@ variables *affect(char *lex, variables *vars) {
    }else { // Affectation d'une opération
       char op = lex[0];
       lex = strtok(NULL, " \n");
-      char *val2 = lex;
+      char *val2 = malloc(strlen(lex) + 1); // Affectation de la deuxième valeur (après l'opérateur)
+      strcpy(val2, lex);
       unbounded_int a, b;
       if (val[0] == '-' || val[0] == '+' || (val[0] >= '0' && val[0] <= '9')) { // C'est une valeur
          a = string2unbounded_int(val);
@@ -95,14 +94,13 @@ variables *affect(char *lex, variables *vars) {
       if (val2[0] == '-' || val2[0] == '+' || (val2[0] >= '0' && val2[0] <= '9')) { // C'est une valeur
          b = string2unbounded_int(val2);
       }else { // C'est une variable
-         variable *v3 = getVar(val, vars);
+         variable *v3 = getVar(val2, vars);
          b = v3 -> n;
       }
       unbounded_int n = resultat(a, b, op);
       v -> n = n;
    }
-   vars = add(v, vars);
-   return vars;
+   add(v, vars);
 }
 
 unbounded_int resultat(unbounded_int a, unbounded_int b, char op) {
@@ -142,10 +140,10 @@ variable *getVar(char *s, variables *vars) {
 }
 
 // Ajoute v aux variables
-variables *add(variable *v, variables *vars) {
+void add(variable *v, variables *vars) {
    if (vars -> premiere == NULL) { // Il n'y a aucune variable
       vars -> premiere = v;
-      return vars;
+      return;
    }
    variable *current = vars -> premiere;
    while (strcmp(current -> s, v -> s) != 0 && current -> suivante != NULL) {
@@ -153,19 +151,10 @@ variables *add(variable *v, variables *vars) {
    }
    if (strcmp(current -> s, v -> s) == 0) { // La variable existe déjà
       current -> n = v -> n;
-      return vars;
+      return;
    }
    // La variable n'existe pas
    current -> suivante = v;
-   return vars;
-}
-
-void printv(variables *v) {
-   variable *c = v -> premiere;
-   while (c != NULL) {
-      printf("Variable : s = %s, v = %s\n", c -> s, unbounded_int2string(c -> n));
-      c = c -> suivante;
-   }
 }
 
 int main(int argc, char **argv) {
@@ -202,7 +191,6 @@ int main(int argc, char **argv) {
    }
    
    char *str = malloc(MAX);
-   //print(str, out);
    char *sepdeb = " 0=";
    char *lex = malloc(MAX);
 
@@ -211,14 +199,12 @@ int main(int argc, char **argv) {
    while (fgets(str, MAX, in) != NULL) {
       lex = strtok(str, sepdeb);
       if (strcmp(lex, "print") == 0) {
-         vars = print(str, out, vars);
+         print(lex, out, vars);
       }else {
-         vars = affect(lex, vars);
+         affect(lex, vars);
       }
-      printv(vars);
    }
 
-   //setUp();
    fclose(in);
    fclose(out);
    return 0;
