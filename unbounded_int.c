@@ -363,5 +363,14 @@ static unbounded_int diff_pos(unbounded_int a, unbounded_int b) {
     diff.premier -> precedent = NULL;
     diff.len = len;
     diff.signe = '+';
+    // On enlève les 0 du début
+    while (diff.premier -> c == '0') {
+        if (diff.len == 1) {
+            break;
+        }
+        diff.premier = diff.premier -> suivant;
+        diff.premier -> precedent = NULL;
+        diff.len--;
+    }
     return diff;
 }
