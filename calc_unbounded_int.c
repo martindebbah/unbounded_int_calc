@@ -14,7 +14,6 @@ typedef struct variable {
 
 typedef struct variables {
    variable *premiere;
-   variable *derniere;
 }variables;
 
 variable *getVar(char *s, variables *vars);
@@ -144,10 +143,8 @@ variable *getVar(char *s, variables *vars) {
 
 // Ajoute v aux variables
 variables *add(variable *v, variables *vars) {
-   if (vars -> derniere == NULL) { // Il n'y a aucune variable
+   if (vars -> premiere == NULL) { // Il n'y a aucune variable
       vars -> premiere = v;
-      vars -> derniere = vars -> premiere;
-      printf("prems\n");
       return vars;
    }
    variable *current = vars -> premiere;
@@ -159,8 +156,7 @@ variables *add(variable *v, variables *vars) {
       return vars;
    }
    // La variable n'existe pas
-   vars -> derniere -> suivante = v;
-   vars -> derniere = vars -> derniere -> suivante;
+   current -> suivante = v;
    return vars;
 }
 
