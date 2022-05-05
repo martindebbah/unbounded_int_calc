@@ -16,9 +16,9 @@ typedef struct variables {
    variable *premiere;
 }variables;
 
-variable *getVar(char *s, variables *vars);
-unbounded_int resultat(unbounded_int a, unbounded_int b, char op);
-void add(variable *v, variables *vars);
+static variable *getVar(char *s, variables *vars);
+static unbounded_int resultat(unbounded_int a, unbounded_int b, char op);
+static void add(variable *v, variables *vars);
 
 // PS: faudra pas qu'on oublie d'enlever ce setUp(), je l'ai laissé pour le moment si tu en as encore besoin.
 
@@ -30,18 +30,8 @@ void setUp(){
    }
 }
 
-// Renvoie 1 si la ligne commence par print, 0 sinon
-int isAPrint(char* line) {
-   char *sep = " 0";
-   char *p = strtok(line, sep);
-   if (strcmp(p, "print") != 0) {
-      return 0;
-   }
-   return 1;
-}
-
 // Ecrit dans le flot out
-void print(char* lex, FILE *out, variables *vars) {
+static void print(char* lex, FILE *out, variables *vars) {
    lex = strtok(NULL, " \n"); // Le nom de la variable
    char *var = malloc(strlen(lex) + 1);
    strcpy(var, lex);
@@ -66,7 +56,7 @@ static int isCorrect(unbounded_int a) { // J'ai pas trouvé comment l'importer d
 }
 
 // Affecte la valeur à la variable
-void affect(char *lex, variables *vars) {
+static void affect(char *lex, variables *vars) {
    char *var = malloc(strlen(lex) + 1); // Le nom de la variable (avant le '=')
    strcpy(var, lex);
    lex = strtok(NULL, " =\n");
@@ -110,7 +100,7 @@ void affect(char *lex, variables *vars) {
       add(v, vars);
 }
 
-unbounded_int resultat(unbounded_int a, unbounded_int b, char op) {
+static unbounded_int resultat(unbounded_int a, unbounded_int b, char op) {
    if(op == '-'){
       return unbounded_int_difference(a,b);
    }
@@ -123,7 +113,7 @@ unbounded_int resultat(unbounded_int a, unbounded_int b, char op) {
 }
 
 // Retourne la variable de nom s
-variable *getVar(char *s, variables *vars) {
+static variable *getVar(char *s, variables *vars) {
    if (vars -> premiere == NULL) { // Il n'y a aucune variable
       variable *v = malloc(sizeof(variable));
       v -> n = string2unbounded_int("0");
@@ -147,7 +137,7 @@ variable *getVar(char *s, variables *vars) {
 }
 
 // Ajoute v aux variables
-void add(variable *v, variables *vars) {
+static void add(variable *v, variables *vars) {
    if (vars -> premiere == NULL) { // Il n'y a aucune variable
       vars -> premiere = v;
       return;
