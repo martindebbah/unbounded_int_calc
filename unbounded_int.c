@@ -22,6 +22,7 @@ unbounded_int string2unbounded_int(const char *e) {
             i++;
         }else if (e[i] == '+') {
             entier -> signe = '+';
+            i++;
         }else {
             entier -> signe = '*';
         }
