@@ -191,7 +191,7 @@ int main(int argc, char **argv) {
    }
    
    char *str = malloc(MAX);
-   char *sepdeb = " 0=";
+   char *sepdeb = " =";
    char *lex = malloc(MAX);
 
    variables *vars = malloc(sizeof(variables));
