@@ -9,6 +9,9 @@ static unbounded_int somme_pos(unbounded_int a, unbounded_int b);
 // Fonction auxiliaire pour la différence (0 < b < a)
 static unbounded_int diff_pos(unbounded_int a, unbounded_int b);
 
+// Fonction auxiliaire pour vérifier que a est bien un unbounded_int
+static int isCorrect(unbounded_int a);
+
 unbounded_int string2unbounded_int(const char *e) {
     unbounded_int *entier = malloc(sizeof(unbounded_int));
     int len = 0;
@@ -17,19 +20,29 @@ unbounded_int string2unbounded_int(const char *e) {
         if (e[i] == '-') {
             entier -> signe = '-';
             i++;
+        }else if (e[i] == '+') {
+            entier -> signe = '+';
         }else {
             entier -> signe = '*';
         }
-    }else {
-        entier -> signe = '+';
     }
     entier -> premier = malloc(sizeof(chiffre));
+    if (entier -> premier == NULL) {
+        entier -> signe = '*';
+        return *entier;
+    }
     chiffre *current = entier -> premier;
     entier -> dernier = NULL;
     while (e[i] != '\0') {
+        if (e[i] < '0' || e[i] > '9')
+            entier -> signe = '*';
         current -> c = e[i];
         current -> precedent = entier -> dernier;
         current -> suivant = malloc(sizeof(chiffre));
+        if (current -> suivant == NULL) {
+            entier -> signe = '*';
+            return *entier;
+        }
         entier -> dernier = current;
         len++;
         current = current -> suivant;
@@ -52,6 +65,10 @@ unbounded_int ll2unbounded_int(long long i) {
     int n = i % 10;
     i /= 10;
     entier -> dernier = malloc(sizeof(chiffre));
+    if (entier -> dernier == NULL) {
+        entier -> signe = '*';
+        return *entier;
+    }
     entier -> premier = entier -> dernier;
     chiffre *current = entier -> dernier;
     current -> c = (char) (n + '0');
@@ -60,6 +77,10 @@ unbounded_int ll2unbounded_int(long long i) {
         i /= 10;
         len++;
         current -> precedent = malloc(sizeof(chiffre));
+        if (current -> precedent == NULL) {
+            entier -> signe = '*';
+            break;
+        }
         current -> precedent -> suivant = current;
         current = current -> precedent;
         current -> c = (char) (n + '0');
@@ -71,6 +92,8 @@ unbounded_int ll2unbounded_int(long long i) {
 
 char *unbounded_int2string(unbounded_int i) {
     char *str;
+    if (isCorrect(i) == 0)
+        return "";
     int index = 0;
     int len = i.len;
     if (i.signe == '-') {
@@ -145,6 +168,11 @@ int unbounded_int_cmp_ll(unbounded_int a, long long b) {
 }
 
 unbounded_int unbounded_int_somme(unbounded_int a, unbounded_int b) {
+    if (isCorrect(a) == 0 || isCorrect(b) == 0) {
+        unbounded_int *err = malloc(sizeof(unbounded_int));
+        err -> signe = '*';
+        return *err;
+    }
     int cmpa = unbounded_int_cmp_ll(a, 0);
     int cmpb = unbounded_int_cmp_ll(b, 0);
     if (cmpa >= 0 && cmpb >= 0) { // a, b >= 0 -> a + b
@@ -163,6 +191,11 @@ unbounded_int unbounded_int_somme(unbounded_int a, unbounded_int b) {
 }
 
 unbounded_int unbounded_int_difference(unbounded_int a, unbounded_int b) {
+    if (isCorrect(a) == 0 || isCorrect(b) == 0) {
+        unbounded_int *err = malloc(sizeof(unbounded_int));
+        err -> signe = '*';
+        return *err;
+    }
     int cmpa = unbounded_int_cmp_ll(a, 0);
     int cmpb = unbounded_int_cmp_ll(b, 0);
     int cmp = unbounded_int_cmp_unbounded_int(a,b);
@@ -194,6 +227,11 @@ unbounded_int unbounded_int_difference(unbounded_int a, unbounded_int b) {
 }
 
 unbounded_int unbounded_int_produit(unbounded_int a, unbounded_int b) {
+    if (isCorrect(a) == 0 || isCorrect(b) == 0) {
+        unbounded_int *err = malloc(sizeof(unbounded_int));
+        err -> signe = '*';
+        return *err;
+    }
     chiffre *pta = a.dernier;
     chiffre *ptb = b.dernier;
     unbounded_int *produit = malloc(sizeof(unbounded_int));
@@ -243,7 +281,8 @@ unbounded_int unbounded_int_produit(unbounded_int a, unbounded_int b) {
     }
     // On enlève les 0 du début
     while (produit -> premier -> c == '0') {
-        if (produit -> len == 1) {
+        if (produit -> len == 1) { // produit == 0
+            produit -> signe = '+';
             break;
         }
         produit -> premier = produit -> premier -> suivant;
@@ -373,4 +412,10 @@ static unbounded_int diff_pos(unbounded_int a, unbounded_int b) {
         diff.len--;
     }
     return diff;
+}
+
+static int isCorrect(unbounded_int a) {
+    if (a.signe == '*')
+        return 0; // False
+    return 1; // True
 }

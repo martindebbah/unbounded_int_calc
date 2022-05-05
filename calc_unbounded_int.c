@@ -59,6 +59,12 @@ void print(char* lex, FILE *out, variables *vars) {
    fputs(str, out);
 }
 
+static int isCorrect(unbounded_int a) { // J'ai pas trouvé comment l'importer de unbounded_int.c donc pour le moment je la réécris ici
+    if (a.signe == '*')
+        return 0; // False
+    return 1; // True
+}
+
 // Affecte la valeur à la variable
 void affect(char *lex, variables *vars) {
    char *var = malloc(strlen(lex) + 1); // Le nom de la variable (avant le '=')
@@ -100,7 +106,8 @@ void affect(char *lex, variables *vars) {
       unbounded_int n = resultat(a, b, op);
       v -> n = n;
    }
-   add(v, vars);
+   if (isCorrect(v -> n))
+      add(v, vars);
 }
 
 unbounded_int resultat(unbounded_int a, unbounded_int b, char op) {
@@ -188,6 +195,11 @@ int main(int argc, char **argv) {
    }else {
       in = stdin;
       out = stdout;
+   }
+
+   if (in == NULL || out == NULL) { // Si erreur lors de l'ouverture des flots
+      printf("Erreur lors de l'ouverture des flots.\n");
+      return 1;
    }
    
    char *str = malloc(MAX);
