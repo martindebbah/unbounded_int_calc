@@ -193,13 +193,15 @@ int main(int argc, char **argv) {
    }
    
    char *str = malloc(MAX);
-   char *sepdeb = " =";
    char *lex = malloc(MAX);
 
    variables *vars = malloc(sizeof(variables));
 
    while (fgets(str, MAX, in) != NULL) {
-      lex = strtok(str, sepdeb);
+      lex = strtok(str, " =");
+      if (lex == NULL)
+         continue;
+         
       if (strcmp(lex, "print") == 0) {
          print(lex, out, vars);
       }else {
