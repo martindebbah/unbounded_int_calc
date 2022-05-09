@@ -52,6 +52,15 @@ unbounded_int string2unbounded_int(const char *e) {
     free(current -> suivant);
     current -> suivant = NULL;
     entier -> len = len;
+    while (entier -> premier -> c == '0') { // On enlève les zéros au début
+        if (entier -> len == 1) {
+            entier -> signe = '+';
+            break;
+        }
+        entier -> premier = entier -> premier -> suivant;
+        entier -> premier -> precedent = NULL;
+        entier -> len--;
+    }
     return *entier;
 }
 
@@ -60,10 +69,11 @@ unbounded_int ll2unbounded_int(long long i) {
     int len = 1;
     if (i < 0) {
         entier -> signe = '-';
+        i *= -1;
     }else {
         entier -> signe = '+';
     }
-    int n = i % 10;
+    int n = (int) (i % 10);
     i /= 10;
     entier -> dernier = malloc(sizeof(chiffre));
     if (entier -> dernier == NULL) {
@@ -74,7 +84,7 @@ unbounded_int ll2unbounded_int(long long i) {
     chiffre *current = entier -> dernier;
     current -> c = (char) (n + '0');
     while (i != 0) {
-        n = i % 10;
+        n = (int) (i % 10);
         i /= 10;
         len++;
         current -> precedent = malloc(sizeof(chiffre));
