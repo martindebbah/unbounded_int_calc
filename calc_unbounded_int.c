@@ -20,16 +20,6 @@ static variable *getVar(char *s, variables *vars);
 static unbounded_int resultat(unbounded_int a, unbounded_int b, char op);
 static void add(variable *v, variables *vars);
 
-// PS: faudra pas qu'on oublie d'enlever ce setUp(), je l'ai laissé pour le moment si tu en as encore besoin.
-
-void setUp(){
-   FILE *line = fopen("line.txt","w");
-   int i =0;
-   while((i = fgetc(line)) !=EOF){
-      printf("%c  \n",i);
-   }
-}
-
 // Ecrit dans le flot out
 static void print(char* lex, FILE *out, variables *vars) {
    lex = strtok(NULL, " \n"); // Le nom de la variable

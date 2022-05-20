@@ -26,6 +26,8 @@ unbounded_int string2unbounded_int(const char *e) {
         }else {
             entier -> signe = '*';
         }
+    }else {
+        entier -> signe = '+';
     }
     entier -> premier = malloc(sizeof(chiffre));
     if (entier -> premier == NULL) {
