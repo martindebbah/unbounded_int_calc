@@ -25,7 +25,7 @@ static void print(char* lex, FILE *out, variables *vars) {
    lex = strtok(NULL, " \n"); // Le nom de la variable
    char *var = malloc(strlen(lex) + 1);
    strcpy(var, lex);
-   if (lex == NULL || lex[0] == '=' || strcmp(lex, "print") == 0) { // Pas de variable vide ou qui commence par '=' ou de nom print
+   if (lex == NULL || lex[0] == '=' || strcmp(lex, "print") == 0 || (lex[0] > '0' && lex[0] < '9')) { // Pas de variable vide ou qui commence par '=' ou de nom print
       return;
    }
    variable *v = getVar(var, vars);
@@ -39,19 +39,27 @@ static void print(char* lex, FILE *out, variables *vars) {
    fputs(str, out);
 }
 
-static int isCorrect(unbounded_int a) { // J'ai pas trouvé comment l'importer de unbounded_int.c donc pour le moment je la réécris ici
+static int isCorrect(unbounded_int a) {
     if (a.signe == '*')
         return 0; // False
     return 1; // True
 }
 
 // Affecte la valeur à la variable
-static void affect(char *lex, variables *vars) {
+static void affect(char *lex, variables *vars, char *l) {
    char *var = malloc(strlen(lex) + 1); // Le nom de la variable (avant le '=')
    strcpy(var, lex);
    lex = strtok(NULL, " =\n");
    if (lex == NULL) // Si la ligne est sans instruction
       return;
+
+   int i = 0;
+   while (l[i] != '=') {
+      if (l[i] == '\0')
+         return;
+      i++;
+   }
+
    char *val = malloc(strlen(lex) + 1); // La première valeur (après le '=')
    strcpy(val, lex);
    lex = strtok(NULL, " =");
@@ -183,11 +191,13 @@ int main(int argc, char **argv) {
    }
    
    char *str = malloc(MAX);
+   char *l = malloc(MAX);
    char *lex = malloc(MAX);
 
    variables *vars = malloc(sizeof(variables));
 
    while (fgets(str, MAX, in) != NULL) {
+      strcpy(l, str);
       lex = strtok(str, " =");
       if (lex == NULL)
          continue;
@@ -195,7 +205,7 @@ int main(int argc, char **argv) {
       if (strcmp(lex, "print") == 0) {
          print(lex, out, vars);
       }else {
-         affect(lex, vars);
+         affect(lex, vars, l);
       }
    }
 

@@ -9,7 +9,7 @@ int main(void) {
     printf("Fonction unbounded_int string2unbounded_int(const char *s)\n");
     unbounded_int a = string2unbounded_int("223");
     printf("-> unbounded_int a = string2unbounded_int(\"223\")\n");
-    unbounded_int b = string2unbounded_int("0");
+    unbounded_int b = string2unbounded_int("0000");
     printf("-> unbounded_int b = string2unbounded_int(\"0000\")\n");
     printf("\n");
 
@@ -18,7 +18,7 @@ int main(void) {
     unbounded_int c = ll2unbounded_int(528);
     printf("-> unbounded_int c = ll2unbounded_int(528)\n");
     unbounded_int d = ll2unbounded_int(-48);
-    printf("-> unbounded_int d = ll2unbounded_int(-28)\n");
+    printf("-> unbounded_int d = ll2unbounded_int(-48)\n");
     printf("\n");
 
     // unbounded2string
